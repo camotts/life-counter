@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<v-select v-bind:items="decks" v-model="selectedDeck" autocomplete @keyup.enter="addValue"></v-select>
+		<v-select v-bind:items="decks" v-model="selectedDeck" autocomplete v-on:change="deckChange" @keyup.enter="addValue"></v-select>
 	</div>
 </template>
 
@@ -12,13 +12,14 @@ import {ipcRenderer} from 'electron'
 
 var deckFolder = "decks"
 
-console.log(ipcRenderer.sendSync('get-deck', deckFolder))
-console.log(ipcRenderer.sendSync('get-deck', deckFolder)[this.format])
-
 export default {
 	data () {
+		var self = this
+		ipcRenderer.on('update-deck', (event, deck) => {
+			self.decks.push(deck)
+		})
 		return {
-			decks: ipcRenderer.sendSync('get-deck', deckFolder)[this.format],
+			decks: JSON.parse(ipcRenderer.sendSync('get-deck', deckFolder))[this.format],
 			selectedDeck: undefined
 		}
 	},
@@ -27,17 +28,19 @@ export default {
 	},
 	watch: {
 		format: function(newVal, oldVal) {
-			this.decks = ipcRenderer.sendSync('get-deck', deckFolder)[this.format]
+			this.decks = JSON.parse(ipcRenderer.sendSync('get-deck', deckFolder))[this.format]
 			this.selectedDeck = undefined
 		}
 	},
 	methods: {
 		addValue: function(e){
-			console.log(ipcRenderer.sendSync('get-deck', deckFolder))
 			ipcRenderer.send('add-deck', this.format, e.target.value)
 			this.decks.push(e.target.value)
 			this.selectedDeck = e.target.value
-    	}
+		},
+		deckChange: function(e){
+			this.$emit('deck-change', this.selectedDeck)
+		}
 	}
 }
 </script>

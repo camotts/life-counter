@@ -4,6 +4,9 @@
 		<section class="container">
 			<player name=player1 v-bind:format="selectedFormat" class="player"></player>
 			<player name=player2 v-bind:format="selectedFormat" class="player"></player>
+			<div> TODO: Add Round </div>
+			<div> TODO: Add Current Match Score </div>
+			<div> TODO: Some option menu to change base dir </div>
 		</section>
 	</v-app>
 </template>
@@ -27,7 +30,7 @@ export default {
 	beforeMount() {
 		// Load formats
 		if (!fs.existsSync(path.join(Config.BaseDir, formatFolder))){
-			fs.mkdir(path.join(Config.BaseDir, formatFolder))
+			fs.mkdirSync(path.join(Config.BaseDir, formatFolder))
 			var normalFormats = "Standard\nModern"
 			try {
 				fs.writeFileSync(path.join(Config.BaseDir, formatFolder,  "formats.txt"), normalFormats, 'utf-8')

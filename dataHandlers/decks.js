@@ -4,18 +4,22 @@ var Config = require('../config/config')
 var os = require('os')
 
 var loaded = false
-var decks = []
+var decks = {}
 
 export function Decks (deckFolder) {
 	if(!loaded) {
 		console.log("Loading decks")
-		if (!fs.existsSync(path.join(Config.BaseDir, deckFolder))) fs.mkdir(path.join(Config.BaseDir, deckFolder))
+		if (!fs.existsSync(path.join(Config.BaseDir, deckFolder))) fs.mkdirSync(path.join(Config.BaseDir, deckFolder))
 		fs.readdirSync(path.join(Config.BaseDir, deckFolder)).forEach(file => {
 			decks[file.split('.')[0]] = fs.readFileSync(path.join(Config.BaseDir, deckFolder,  file), 'utf-8').split(os.EOL)
 		})
 		loaded = true
 	}
 	return decks
+}
+
+export function AddDeck(format, deck) {
+	if (!decks[format].includes(deck)) decks[format].push(deck)
 }
 
 export function SaveDecks (deckFolder) {

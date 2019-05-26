@@ -1,9 +1,9 @@
 /*
 **  Nuxt
 */
-const http = require('http')
-const { Nuxt, Builder } = require('nuxt')
-let config = require('./nuxt.config.js')
+import http from 'http'
+import { Nuxt, Builder } from 'nuxt'
+import config from './nuxt.config.js'
 config.rootDir = __dirname // for electron-builder
 // Init Nuxt.js
 const nuxt = new Nuxt(config)
@@ -31,7 +31,11 @@ import * as DeckHandler from './dataHandlers/decks'
 
 const newWin = () => {
 	win = new BrowserWindow({
-		icon: path.join(__dirname, 'static/icon.png')
+		icon: path.join(__dirname, 'static/icon.png'),
+		webPreferences: {
+            nodeIntegration: true
+		},
+		title: 'test'
 	})
 	win.maximize()
 	win.on('closed', () => win = null)
@@ -52,12 +56,13 @@ const newWin = () => {
 	} else { return win.loadURL(_NUXT_URL_) }
 }
 
-ipcMain.on('get-deck', (event, arg) => {
-	event.returnValue = DeckHandler.Decks(arg)
+ipcMain.on('get-deck', (event, deckPath) => {
+	event.returnValue = JSON.stringify(DeckHandler.Decks(deckPath))
 })
 
-ipcMain.on('add-deck', (event, arg, deck) => {
-	console.log(arg)
+ipcMain.on('add-deck', (event, format, deck) => {
+	DeckHandler.AddDeck(format, deck)
+	win.webContents.send('update-deck', deck)
 })
 
 app.on('ready', newWin)

@@ -2,8 +2,8 @@
     <div style="text-align:center">
 		<div>
 			<div>
-				<v-text-field v-bind:value="playerName" placeholder="Name"></v-text-field>
-				<decks  v-bind:format="format"></decks>
+				<v-text-field v-model="playerName" placeholder="Name"></v-text-field>
+				<decks v-bind:format="format" v-on:deck-change="changeDeck"></decks>
 			</div>
 			<div>
 				{{life}}
@@ -36,18 +36,18 @@ import fs from "fs"
 import path from "path"
 import * as Config from '../config/config'
 
-var lifeFolder = "life"
+var lifeFolder = "out"
 
 export default {
 	data: function() {
 		return {
+			playerName: "",
 			life: 20,
 			poison: 0,
 		}
 	},
 	props: {
 		name: String,
-		playerName: String,
 		format: String
 	},
 	components: { LifeButton, Decks },
@@ -69,16 +69,36 @@ export default {
 			catch(e) {
 				alert("Unable to save to file")
 			}
+		},
+		changeDeck(change) {
+			console.log(this.playerName)
+			try {
+				fs.writeFileSync(path.join(Config.BaseDir, lifeFolder, this.name + ".deck"), change, 'utf-8')
+			}
+			catch(e) {
+				alert("Unable to update decklist")
+			}
 		}
 	},
 	beforeMount() {
-		if (!fs.existsSync(path.join(Config.BaseDir, lifeFolder))) fs.mkdir(path.join(Config.BaseDir, lifeFolder))
+		if (!fs.existsSync(path.join(Config.BaseDir, lifeFolder))) fs.mkdirSync(path.join(Config.BaseDir, lifeFolder))
 		try {
 			fs.writeFileSync(path.join(Config.BaseDir, lifeFolder,  this.name + ".life"), this.life, 'utf-8')
 			fs.writeFileSync(path.join(Config.BaseDir, lifeFolder, this.name + ".psn"), this.poison, 'utf-8')
 		}
 		catch(e) {
 			alert("Unable to save to file: " + e)
+		}
+	},
+	watch: {
+		playerName: function(newVal, oldVal) {
+			console.log("Changing player name")
+			try {
+				fs.writeFileSync(path.join(Config.BaseDir, lifeFolder, this.name + ".name"), newVal, 'utf-8')
+			}
+			catch(e) {
+				alert("Unable to update player name")
+			}
 		}
 	}
 };
