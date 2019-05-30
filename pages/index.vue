@@ -1,13 +1,14 @@
 <template>
 	<v-app>
 		<v-select v-bind:items="formats" v-model="selectedFormat"></v-select>
+		<div>Round {{round}}</div>
 		<section class="container">
-			<player name=player1 v-bind:format="selectedFormat" class="player"></player>
-			<player name=player2 v-bind:format="selectedFormat" class="player"></player>
-			<div> TODO: Add Round </div>
+			<player name=player1 v-bind:format="selectedFormat" class="player" v-bind:round="round"></player>
+			<player name=player2 v-bind:format="selectedFormat" class="player" v-bind:round="round"></player>
 			<div> TODO: Add Current Match Score </div>
 			<div> TODO: Some option menu to change base dir </div>
 		</section>
+		<v-btn v-on:click="nextRound">End Round</v-btn>
 	</v-app>
 </template>
 
@@ -24,7 +25,8 @@ export default {
 	data () {
 		return {
 			formats: [],
-			selectedFormat: undefined
+			selectedFormat: undefined,
+			round: 1
 		}
 	},
 	beforeMount() {
@@ -43,6 +45,12 @@ export default {
 		var data = fs.readFileSync(path.join(Config.BaseDir, formatFolder,  "formats.txt"), 'utf-8')
 		this.formats = data.split("\n")
 		this.selectedFormat = this.formats[0]
+	},
+	methods: {
+		// TODO: Have modal popup confirming score
+		nextRound (event) {
+			this.round++
+		}
 	}
 }
 </script>
