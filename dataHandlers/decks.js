@@ -3,15 +3,15 @@ var path = require('path')
 var Config = require('../config/config')
 var os = require('os')
 
+import {GetFormats, ReadDecks, SaveDecks as SD} from "./output"
+
 var loaded = false
 var decks = {}
 
-export function Decks (deckFolder) {
+export function Decks () {
 	if(!loaded) {
-		console.log("Loading decks")
-		if (!fs.existsSync(path.join(Config.BaseDir, deckFolder))) fs.mkdirSync(path.join(Config.BaseDir, deckFolder))
-		fs.readdirSync(path.join(Config.BaseDir, deckFolder)).forEach(file => {
-			decks[file.split('.')[0]] = fs.readFileSync(path.join(Config.BaseDir, deckFolder,  file), 'utf-8').split(os.EOL)
+		GetFormats().forEach(format => {
+			decks[format] = ReadDecks(format).split(os.EOL)
 		})
 		loaded = true
 	}
@@ -22,9 +22,9 @@ export function AddDeck(format, deck) {
 	if (!decks[format].includes(deck)) decks[format].push(deck)
 }
 
-export function SaveDecks (deckFolder) {
+export function SaveDecks () {
 	for(var key in decks) {
-		fs.writeFileSync(path.join(Config.BaseDir, deckFolder,  key + ".txt"), decks[key].sort().join(os.EOL), 'utf-8')
+		SD(key, decks[key].sort().join(os.EOL))
 	}
 }
 /*

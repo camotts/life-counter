@@ -32,9 +32,9 @@
 <script>
 import LifeButton from "./LifeButton"
 import Decks from "./Decks"
-import fs from "fs"
 import path from "path"
 import * as Config from '../config/config'
+import {ipcRenderer} from 'electron'
 
 var lifeFolder = "out"
 
@@ -54,51 +54,23 @@ export default {
 	methods: {
 		changeLife(change) {
 			this.life = this.life + change
-			try {
-				fs.writeFileSync(path.join(Config.BaseDir, lifeFolder, this.name + ".life"), this.life, 'utf-8')
-			}
-			catch(e) {
-				alert("Unable to save to file")
-			}
+			ipcRenderer.send('save-player-life', this.name, this.life)
 		},
 		changePoison(change) {
 			this.poison = Math.max(this.poison + change, 0)
-			try {
-				fs.writeFileSync(path.join(Config.BaseDir, lifeFolder, this.name + ".psn"), this.poison, 'utf-8')
-			}
-			catch(e) {
-				alert("Unable to save to file")
-			}
+			ipcRenderer.send('save-player-poison', this.name, this.poison)
 		},
 		changeDeck(change) {
-			console.log(this.playerName)
-			try {
-				fs.writeFileSync(path.join(Config.BaseDir, lifeFolder, this.name + ".deck"), change, 'utf-8')
-			}
-			catch(e) {
-				alert("Unable to update decklist")
-			}
+			ipcRenderer.send('save-player-deck', this.name, change)
 		}
 	},
 	beforeMount() {
-		if (!fs.existsSync(path.join(Config.BaseDir, lifeFolder))) fs.mkdirSync(path.join(Config.BaseDir, lifeFolder))
-		try {
-			fs.writeFileSync(path.join(Config.BaseDir, lifeFolder,  this.name + ".life"), this.life, 'utf-8')
-			fs.writeFileSync(path.join(Config.BaseDir, lifeFolder, this.name + ".psn"), this.poison, 'utf-8')
-		}
-		catch(e) {
-			alert("Unable to save to file: " + e)
-		}
+		ipcRenderer.send('save-player-life', this.name, this.life)
+		ipcRenderer.send('save-player-poison', this.name, this.poison)
 	},
 	watch: {
 		playerName: function(newVal, oldVal) {
-			console.log("Changing player name")
-			try {
-				fs.writeFileSync(path.join(Config.BaseDir, lifeFolder, this.name + ".name"), newVal, 'utf-8')
-			}
-			catch(e) {
-				alert("Unable to update player name")
-			}
+			ipcRenderer.send('save-player-name', this.name, this.playerName)
 		}
 	}
 };

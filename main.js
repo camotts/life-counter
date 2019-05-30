@@ -28,6 +28,9 @@ let win = null // Current window
 import {app, BrowserWindow, ipcMain} from 'electron'
 import * as path from 'path'
 import * as DeckHandler from './dataHandlers/decks'
+import * as FileHandler from './dataHandlers/output'
+
+FileHandler.InitRelativeDirs()
 
 const newWin = () => {
 	win = new BrowserWindow({
@@ -56,18 +59,32 @@ const newWin = () => {
 	} else { return win.loadURL(_NUXT_URL_) }
 }
 
-ipcMain.on('get-deck', (event, deckPath) => {
-	event.returnValue = JSON.stringify(DeckHandler.Decks(deckPath))
+// Deck Manipuldation
+ipcMain.on('get-deck', (event,) => {
+	event.returnValue = JSON.stringify(DeckHandler.Decks())
 })
-
 ipcMain.on('add-deck', (event, format, deck) => {
 	DeckHandler.AddDeck(format, deck)
 	win.webContents.send('update-deck', deck)
 })
 
+// File Manipulation
+ipcMain.on('save-player-life', (event, player, life) => {
+	FileHandler.SavePlayerLife(player, life)
+})
+ipcMain.on('save-player-poison', (event, player, poison) => {
+	FileHandler.SavePlayerPoison(player, poison)
+})
+ipcMain.on('save-player-deck', (event, player, deck) => {
+	FileHandler.SavePlayerDeck(player, deck)
+})
+ipcMain.on('save-player-name', (event, player, name) => {
+	FileHandler.SavePlayerName(player, name)
+})
+
 app.on('ready', newWin)
 app.on('window-all-closed', () => {
-	DeckHandler.SaveDecks("decks")
+	DeckHandler.SaveDecks()
 	app.quit()
 })
 app.on('activate', () => win === null && newWin())

@@ -1,19 +1,20 @@
 <template>
 	<v-app>
 		<v-select v-bind:items="formats" v-model="selectedFormat"></v-select>
-		<div>Round {{round}}</div>
+		<round></round>
 		<section class="container">
 			<player name=player1 v-bind:format="selectedFormat" class="player" v-bind:round="round"></player>
 			<player name=player2 v-bind:format="selectedFormat" class="player" v-bind:round="round"></player>
 			<div> TODO: Add Current Match Score </div>
 			<div> TODO: Some option menu to change base dir </div>
 		</section>
-		<v-btn v-on:click="nextRound">End Round</v-btn>
+		<v-btn v-on="on">End Round</v-btn>
 	</v-app>
 </template>
 
 <script>
 import Player from '../components/Player'
+import Round from '../components/Round'
 import fs from "fs"
 import path from "path"
 import * as Config from '../config/config'
@@ -21,12 +22,11 @@ import * as Config from '../config/config'
 var formatFolder = "formats"
 
 export default {
-	components: {Player},
+	components: {Player, Round},
 	data () {
 		return {
 			formats: [],
-			selectedFormat: undefined,
-			round: 1
+			selectedFormat: undefined
 		}
 	},
 	beforeMount() {
@@ -49,7 +49,7 @@ export default {
 	methods: {
 		// TODO: Have modal popup confirming score
 		nextRound (event) {
-			this.round++
+			console.log("Trigger next round")
 		}
 	}
 }

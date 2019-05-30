@@ -1,3 +1,3 @@
 var path = require('path');
 
-export const BaseDir = path.join("D:", "Programming", "vue", "life-counter", "testFolder")
+export const BaseDir = path.join("/Users", "cameron.otts", "Development", "life-counter", "testFolder")

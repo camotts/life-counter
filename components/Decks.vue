@@ -5,12 +5,9 @@
 </template>
 
 <script>
-import fs from "fs"
 import path from "path"
 import * as Config from '../config/config'
 import {ipcRenderer} from 'electron'
-
-var deckFolder = "decks"
 
 export default {
 	data () {
@@ -19,7 +16,7 @@ export default {
 			self.decks.push(deck)
 		})
 		return {
-			decks: JSON.parse(ipcRenderer.sendSync('get-deck', deckFolder))[this.format],
+			decks: JSON.parse(ipcRenderer.sendSync('get-deck'))[this.format],
 			selectedDeck: undefined
 		}
 	},
@@ -28,7 +25,7 @@ export default {
 	},
 	watch: {
 		format: function(newVal, oldVal) {
-			this.decks = JSON.parse(ipcRenderer.sendSync('get-deck', deckFolder))[this.format]
+			this.decks = JSON.parse(ipcRenderer.sendSync('get-deck'))[this.format]
 			this.selectedDeck = undefined
 		}
 	},
